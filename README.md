@@ -1,4 +1,50 @@
-# Welcome to Remix!
+# My Part of the Readme
+
+Hi all! I'm Jeremy and I'm learning how to create a basic React Remix app. I'll make a checklist here of things I've done so far.
+
+- [x] basic nav
+- [x] basic styling (p, h1, etc.)
+- [x] basic nav styles
+- [ ] conditionally render nav links
+- [x] index route
+- [x] basic routes for navbar
+- [ ] routes for all pages (CRUD applications)
+  - [ ] Users
+  - [ ] Routines
+  - [ ] Activities
+- [ ] connect to database (going to try pg first, then prisma)
+  - [ ] pg
+  - [ ] prisma
+- [ ] connect to outside API
+- [ ] generate loaders
+  - [ ] register user
+  - [ ] login user
+  - [ ] profile page
+  - [ ] see list of routines
+  - [ ] see list of activities
+- [ ] generate actions
+  - [ ] create routines
+  - [ ] edit routines
+  - [ ] delete routines
+  - [ ] create activities
+  - [ ] edit activities
+  - [ ] delete activities
+- [ ] make a few forms for the actions
+  - [ ] users
+    - [ ] Create
+    - [ ] update
+    - [ ] delete
+  - [ ] routines
+    - [ ] Create
+    - [ ] update
+    - [ ] delete
+  - [ ] activities
+    - [ ] Create
+    - [ ] update
+    - [ ] delete
+- [ ] style the pages
+
+## Welcome to Remix
 
 - [Remix Docs](https://remix.run/docs)
 

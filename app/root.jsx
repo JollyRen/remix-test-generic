@@ -1,5 +1,6 @@
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
 import Navbar from './navbar.jsx'
+import { useState } from 'react'
 import globalStyles from '~/styles/global.css'
 
 export const meta = () => ({
@@ -20,10 +21,14 @@ export const links = () => [
 ]
 
 export default function App() {
+  const [user, setUser] = useState({})
+  const contextObject = {
+    userState: [user, setUser]
+  }
   return (
     <Doc>
       <Layout>
-        <Outlet />
+        <Outlet context={contextObject} />
       </Layout>
     </Doc>
   )
@@ -36,7 +41,7 @@ export const Doc = ({ children }) => {
         <Meta />
         <Links />
       </head>
-      <body style={{ width: '100vw', height: '100vh' }}>
+      <body>
         {children}
         <ScrollRestoration />
         <Scripts />
