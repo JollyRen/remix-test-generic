@@ -1,3 +1,3 @@
-const Users = (params) => {}
+const Users = () => {}
 
 export default Users

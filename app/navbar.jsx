@@ -12,8 +12,8 @@ const Navbar = ({ user }) => {
   ])
 
   const changeNavLink = (oldLinks, idx) => {
-    console.log('starting new change')
-    console.log(oldLinks)
+    // console.log('starting new change')
+    // console.log(oldLinks)
     const newLinks = [...oldLinks]
     for (const [i, el] of newLinks.entries()) {
       // console.log('before', idx, i, el)
@@ -21,7 +21,7 @@ const Navbar = ({ user }) => {
       else newLinks[i].className = 'nav-link'
       // console.log('after', idx, i, el)
     }
-    console.log(newLinks)
+    // console.log(newLinks)
     return newLinks
   }
   // const selected = useRef()

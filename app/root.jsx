@@ -2,6 +2,8 @@ import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@re
 import Navbar from './navbar.jsx'
 import { useState } from 'react'
 import globalStyles from '~/styles/global.css'
+import { json } from '@remix-run/node'
+import { getUser, getPublicRoutines, getPublicActivities } from './utils'
 
 export const meta = () => ({
   charset: 'utf-8',
@@ -20,10 +22,24 @@ export const links = () => [
   }
 ]
 
+export const loader = ({ request }) => {
+  return json()
+}
+
+export const action = ({ request }) => {
+  return
+}
+
 export default function App() {
-  const [user, setUser] = useState({})
+  const [user, setUser] = useState(getUser() || {})
+  const [publicRoutines, setPublicRoutines] = useState(getPublicRoutines() || [])
+  const [puclicActivities, setPublicActivities] = useState(getPublicActivities() || [])
+  const [token, setToken] = useState(localStorage.getItem('token') || '')
   const contextObject = {
-    userState: [user, setUser]
+    userState: [user, setUser],
+    routineState: [publicRoutines, setPublicRoutines],
+    activityState: [puclicActivities, setPublicActivities],
+    tokenState: [token, setToken]
   }
   return (
     <Doc>

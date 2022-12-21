@@ -1,5 +1,5 @@
-function routines() {
+function Routines() {
   return <div>routines</div>
 }
 
-export default routines
+export default Routines
