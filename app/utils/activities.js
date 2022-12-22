@@ -16,6 +16,12 @@ const {
 export const getActivities = async () => {
   try {
     const response = await fetch(rGetActivities)
+
+    //server error check
+    // console.log(response)
+    if (response.status >= 500 && response.status <= 599)
+      return { error: 'serverError', message: response.statusText }
+
     const activities = await response.json()
     console.log('activities', activities)
     // Array{
@@ -33,7 +39,7 @@ export const getActivities = async () => {
     const unknownError = { message: 'No activities found' }
 
     if (activities?.error) return error //object
-    if (activities) return success //array{}
+    if (activities.length) return success //array{}
     return unknownError //object
   } catch (error) {
     console.error(error)
@@ -54,6 +60,10 @@ export const createActivity = async ({ name, description }) => {
     }
 
     const rawRes = await fetch(rCreateActivity, req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const createdActivity = await rawRes.json()
     console.log('created activity', createdActivity)
     // Object: {
@@ -61,6 +71,7 @@ export const createActivity = async ({ name, description }) => {
     //   name: string,
     //   description: string
     // }
+
     const error = {
       name: createdActivity?.name || null,
       error: createdActivity?.error || null,
@@ -84,6 +95,10 @@ export const updateActivity = async ({ name = null, description = null, activity
     const req = { method: 'PATCH', body }
 
     const rawRes = await fetch(rUpdateActivity(activityId), req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const updatedActivity = await rawRes.json()
     console.log('updated activity', updatedActivity)
     //Object {
@@ -112,6 +127,10 @@ export const updateActivity = async ({ name = null, description = null, activity
 export const getRoutinesByActivity = async ({ activityId }) => {
   try {
     const rawRes = await fetch(rGetRoutinesByActivity(activityId))
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const routines = await rawRes.json()
     console.log('routines by activityId', routines)
     //Array {
@@ -127,7 +146,7 @@ export const getRoutinesByActivity = async ({ activityId }) => {
     //     description: string,
     //     duration: 8,
     //     count: int,
-    //     routineActifityId: int,
+    //     routineActivityId: int,
     //     routineId: int
     //   }
     // }

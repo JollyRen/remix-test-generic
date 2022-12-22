@@ -8,6 +8,10 @@ export const updateRA = async ({ count, duration, raId }) => {
     const req = { method: 'PATCH', body }
 
     const rawRes = await fetch(rUpdateRA(raId), req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const updatedRA = await rawRes.json()
     console.log(updatedRA)
 
@@ -53,6 +57,10 @@ export const deleteRA = async ({ token, raId }) => {
     const req = { method: 'DELETE', headers }
 
     const rawRes = await fetch(rDeleteRA(raId), req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const deletedRA = await rawRes.json()
     console.log(deletedRA)
     //Object{

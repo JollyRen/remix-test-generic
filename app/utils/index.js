@@ -21,7 +21,7 @@ import {
 
 import { updateRA, deleteRA } from './ra'
 
-export default {
+export {
   getActivities,
   getRoutinesByActivity,
   createActivity,

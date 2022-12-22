@@ -3,7 +3,7 @@ import Navbar from './navbar.jsx'
 import { useState } from 'react'
 import globalStyles from '~/styles/global.css'
 import { json } from '@remix-run/node'
-import { getUser, getPublicRoutines, getPublicActivities } from './utils'
+import { getUser, getRoutines, getActivities } from './utils'
 
 export const meta = () => ({
   charset: 'utf-8',
@@ -22,28 +22,31 @@ export const links = () => [
   }
 ]
 
-export const loader = ({ request }) => {
-  return json()
-}
+// export const loader = ({ request }) => {
+//   return json()
+// }
 
-export const action = ({ request }) => {
-  return
-}
+// export const action = ({ request }) => {
+//   return
+// }
 
 export default function App() {
-  const [user, setUser] = useState(getUser() || {})
-  const [publicRoutines, setPublicRoutines] = useState(getPublicRoutines() || [])
-  const [puclicActivities, setPublicActivities] = useState(getPublicActivities() || [])
-  const [token, setToken] = useState(localStorage.getItem('token') || '')
+  const [user, setUser] = useState({})
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [publicRoutines, setPublicRoutines] = useState([])
+  const [publicActivities, setPublicActivities] = useState([])
+  const [token, setToken] = useState('')
+
   const contextObject = {
     userState: [user, setUser],
+    isLoggedInState: [isLoggedIn, setIsLoggedIn],
     routineState: [publicRoutines, setPublicRoutines],
-    activityState: [puclicActivities, setPublicActivities],
+    activityState: [publicActivities, setPublicActivities],
     tokenState: [token, setToken]
   }
   return (
     <Doc>
-      <Layout>
+      <Layout user={user} isLoggedIn={isLoggedIn}>
         <Outlet context={contextObject} />
       </Layout>
     </Doc>
@@ -67,10 +70,10 @@ export const Doc = ({ children }) => {
   )
 }
 
-export const Layout = ({ children }) => {
+export const Layout = ({ children, user, isLoggedIn }) => {
   return (
     <div className="layout-container" style={{}}>
-      <Navbar />
+      <Navbar user={user} isLoggedIn={isLoggedIn} />
       {children}
       <Footer />
     </div>

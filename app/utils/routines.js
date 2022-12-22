@@ -18,6 +18,10 @@ export const getRoutines = async () => {
     const req = { method, headers }
 
     const rawRes = await fetch(rGetRoutines, req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const routines = await rawRes.json()
     console.log('routines: ', routines)
     // Array{
@@ -64,6 +68,10 @@ export const createRoutine = async ({ name, goal, isPublic = null }) => {
     const req = { method: 'POST', headers, body }
 
     const rawRes = await fetch(rCreateRoutine, req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const createdRoutine = await rawRes.json()
     console.log('created routines', createdRoutine)
     // createdRoutine: Object{
@@ -104,6 +112,10 @@ export const updateRoutine = async ({ name = null, goal = null, routineId, isPub
     const req = { method: 'PATCH', headers, body }
 
     const rawRes = await fetch(rUpdateRoutine(routineId), req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const updatedRoutine = await rawRes.json()
     console.log('updated routine: ', updatedRoutine)
 
@@ -150,6 +162,10 @@ export const deleteRoutine = async ({ token, routineId }) => {
     const req = { method: 'DELETE', headers }
 
     const rawRes = await fetch(rDeleteRoutine(routineId), req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const deletedRoutine = await rawRes.json()
     console.log('deleted routine: ', deletedRoutine)
 
@@ -192,6 +208,10 @@ export const attachActToRoutine = async ({ activityId, count, duration, routineI
     const req = { method: 'POST', headers, body }
 
     const rawRes = await fetch(rAttachActToRoutine(routineId), req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const attachedAct = await rawRes.json()
     console.log('attached act to routine: ', attachedAct)
     // Object {

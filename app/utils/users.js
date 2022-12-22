@@ -15,6 +15,10 @@ export const getUser = async ({ token }) => {
     const req = { headers }
 
     const rawRes = await fetch(rGetUser, req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const user = await rawRes.json()
     console.log(user)
     // Object {
@@ -47,6 +51,10 @@ export const getUserPubRoutines = async ({ username }) => {
     const req = { headers }
 
     const rawRes = await fetch(rGetUserPubRoutines(username), req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const userPubRoutines = await rawRes.json()
     console.log('users public routines: ', userPubRoutines)
     // Array{
@@ -94,6 +102,10 @@ export const regOrLoginUser = async ({ username, password, action }) => {
     const req = { method, headers, body }
 
     const rawRes = await fetch(url, req)
+
+    if (rawRes.status >= 500 && rawRes.status <= 599)
+      return { error: 'serverError', message: rawRes.statusText }
+
     const loggedInUser = await rawRes.json()
     console.log('this is user response', loggedInUser)
     // Object  {

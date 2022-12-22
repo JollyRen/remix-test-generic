@@ -3,40 +3,66 @@ import { Form, useActionData, useLoaderData, useOutletContext, useNavigate } fro
 import { useEffect, useState } from 'react'
 import { regOrLoginUser } from '../../utils/index'
 
-export const loader = async ({ req }) => {
-  return json()
-}
+// export const loader = async ({ req }) => {
+//   return json()
+// }
 
-export const action = async ({ rawReq }) => {
-  const formData = await rawReq.formData()
-  const req = Object.fromEntries(formData)
-  console.log(req)
-  const res = await regOrLoginUser(req.username, req.password, req._action)
-  if (res.error || res.token) return res
+export const action = async ({ request }) => {
+  const formData = await request.formData()
+  const { _action, username, password } = Object.fromEntries(formData)
+  const { user, message, token, error, name } = await regOrLoginUser(username, password, _action)
+  if (error) return { name, error, message }
+  if (token.length) return { user, token, message }
   return { error: 'noTokenNoUser', message: 'No token made or user found!' }
 }
 
 function Login() {
   const navigate = useNavigate()
+  const actionData = useActionData()
   const [isRegister, setIsRegister] = useState(false)
-  const { user: fetchedUser, token: fetchedToken, error, message } = useActionData()
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
   const {
     userState: [user, setUser],
+    isLoggedInState: [isLoggedIn, setIsLoggedIn],
     tokenState: [token, setToken]
   } = useOutletContext()
 
-  if (user || token) {
-    setIsRegister(false)
-    navigate('/profile')
-  }
   useEffect(() => {
-    if (fetchedUser && fetchedToken) {
-      setUser(fetchedUser)
-      setToken(fetchedToken)
+    if (actionData?.fetchedUser && actionData?.fetchedToken) {
+      const { user, token, message } = actionData
+      setUser(user)
+      setToken(token)
+      setMessage(message)
+      setIsLoggedIn(true)
+      navigate('/')
     }
-  }, [fetchedUser, fetchedToken])
+    if (actionData?.error) {
+      const { error, message } = actionData
+      setError(error)
+      setMessage(message)
+    }
+  }, [actionData])
 
-  const handleIsRegister = () => setIsRegister(true)
+  const handleIsRegister = () => setIsRegister(!isRegister)
+
+  const registerToggle = !isRegister ? (
+    <p>
+      Not registered?{' '}
+      <span style={{ color: 'blue' }} onClick={handleIsRegister}>
+        click here
+      </span>
+      !
+    </p>
+  ) : (
+    <p>
+      To log in{' '}
+      <span style={{ color: 'blue' }} onClick={handleIsRegister}>
+        click here
+      </span>
+      !
+    </p>
+  )
 
   return (
     <div>
@@ -54,14 +80,7 @@ function Login() {
           <span style={{ color: 'red' }}>{message}</span>
         </p>
       )}
-      {!isRegister && (
-        <p>
-          not registered?{' '}
-          <span style={{ color: 'blue' }} onClick={handleIsRegister}>
-            click here!
-          </span>
-        </p>
-      )}
+      {registerToggle}
     </div>
   )
 }
