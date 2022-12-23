@@ -1,7 +1,14 @@
 import { json, redirect } from '@remix-run/node'
-import { Form, useActionData, useLoaderData, useOutletContext, useNavigate } from '@remix-run/react'
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useOutletContext,
+  useNavigate,
+  useSearchParams
+} from '@remix-run/react'
 import { useEffect, useState } from 'react'
-import { regOrLoginUser } from '../../utils/index'
+import { regOrLoginUser } from '../../utils/index.js'
 
 // export const loader = async ({ req }) => {
 //   return json()
@@ -17,9 +24,10 @@ export const action = async ({ request }) => {
 }
 
 function Login() {
+  const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const actionData = useActionData()
-  const [isRegister, setIsRegister] = useState(false)
+  const [isRegister, setIsRegister] = useState(params.get('register') || false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const {
@@ -44,7 +52,11 @@ function Login() {
     }
   }, [actionData])
 
-  const handleIsRegister = () => setIsRegister(!isRegister)
+  const handleIsRegister = () => {
+    if (params.get('register')) setParams('')
+    else setParams('register=true')
+    setIsRegister(!isRegister)
+  }
 
   const registerToggle = !isRegister ? (
     <p>

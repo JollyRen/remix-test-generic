@@ -2,8 +2,6 @@ import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@re
 import Navbar from './navbar.jsx'
 import { useState } from 'react'
 import globalStyles from '~/styles/global.css'
-import { json } from '@remix-run/node'
-import { getUser, getRoutines, getActivities } from './utils'
 
 export const meta = () => ({
   charset: 'utf-8',
@@ -21,14 +19,6 @@ export const links = () => [
     href: 'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,800;1,300;1,400;1,600;1,800&display=swap'
   }
 ]
-
-// export const loader = ({ request }) => {
-//   return json()
-// }
-
-// export const action = ({ request }) => {
-//   return
-// }
 
 export default function App() {
   const [user, setUser] = useState({})
@@ -72,7 +62,7 @@ export const Doc = ({ children }) => {
 
 export const Layout = ({ children, user, isLoggedIn }) => {
   return (
-    <div className="layout-container" style={{}}>
+    <div className="layout-container">
       <Navbar user={user} isLoggedIn={isLoggedIn} />
       {children}
       <Footer />

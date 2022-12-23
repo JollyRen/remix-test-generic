@@ -21,7 +21,13 @@ import {
 
 import { updateRA, deleteRA } from './ra'
 
+import { fetchWithAbort } from './fetchHelpers'
+
+import navlinks from './navlinks'
+
 export {
+  navlinks,
+  fetchWithAbort,
   getActivities,
   getRoutinesByActivity,
   createActivity,

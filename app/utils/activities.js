@@ -1,4 +1,5 @@
 import { activities } from './routes.js'
+import { fetchWithAbort } from './index.js'
 
 const {
   rGetActivities,
@@ -15,15 +16,16 @@ const {
 
 export const getActivities = async () => {
   try {
-    const response = await fetch(rGetActivities)
-
+    const response = await fetchWithAbort(rGetActivities, 5000)
     //server error check
     // console.log(response)
-    if (response.status >= 500 && response.status <= 599)
-      return { error: 'serverError', message: response.statusText }
+
+    if (response.error) {
+      return { activities: response }
+    }
 
     const activities = await response.json()
-    console.log('activities', activities)
+    // console.log('activities', activities)
     // Array{
     //   id: int,
     //   name: string,
@@ -31,19 +33,25 @@ export const getActivities = async () => {
     // }
 
     const error = {
-      name: activities?.name || null,
-      error: activities?.error || null,
-      message: activities?.message || null
+      activities: {
+        name: activities?.name || '',
+        error: activities?.error || '',
+        message: activities?.message || ''
+      }
     }
-    const success = { message: 'Found Activities', activities }
-    const unknownError = { message: 'No activities found' }
 
-    if (activities?.error) return error //object
-    if (activities.length) return success //array{}
-    return unknownError //object
+    const success = { activities: { message: 'Found Activities', activities } }
+    const unknownError = { activities: { message: 'No activities found', error: 'unknownError' } }
+
+    if (activities?.error) return error
+    //object {activities: {error: { name, error, message}}}
+    if (!activities.length) return unknownError
+    //object {activities: {message}}
+    return success
+    //object {activities: {message, activities: []}}
   } catch (error) {
     console.error(error)
-    return { error, message: error.detail }
+    return { activities: { error, message: error.detail, name: 'fetchError' } }
   }
 }
 
@@ -126,13 +134,19 @@ export const updateActivity = async ({ name = null, description = null, activity
 
 export const getRoutinesByActivity = async ({ activityId }) => {
   try {
-    const rawRes = await fetch(rGetRoutinesByActivity(activityId))
+    // console.log(activityId)
+    // const rawRes = await fetch(rGetRoutinesByActivity(activityId))
 
-    if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
+    const rawRes = await fetchWithAbort(rGetRoutinesByActivity(Number(activityId)), 5000)
+    //server error check
+    // console.log(rawRes)
+
+    if (rawRes.error) {
+      return { routines: rawRes }
+    }
 
     const routines = await rawRes.json()
-    console.log('routines by activityId', routines)
+    // console.log('routines by activityId', routines)
     //Array {
     //   id: int,
     //   creatorID: int,
@@ -151,16 +165,18 @@ export const getRoutinesByActivity = async ({ activityId }) => {
     //   }
     // }
     const error = {
-      name: routines?.name || null,
-      error: routines?.error || null,
-      message: routines?.message || null
+      routines: {
+        name: routines?.name || null,
+        error: routines?.error || null,
+        message: routines?.message || null
+      }
     }
-    const success = { message: 'Routines found', routines }
-    const unknownError = { message: 'No routines found' }
+    const success = { routines: { message: 'Routines found', routines } }
+    const unknownError = { routines: { message: 'No routines found', error: 'noRoutines' } }
 
     if (routines?.error) return error
-    if (routines) return success
-    return unknownError
+    if (!routines) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return { error, message: error.detail }

@@ -12,7 +12,8 @@ p,
 span,
 strong,
 em,
-li {
+li,
+Link {
   font-family: 'Open Sans', Arial, Helvetica, sans-serif;
 }
 
@@ -20,7 +21,8 @@ p,
 span,
 strong,
 em,
-li {
+li,
+Link {
   font-weight: 600;
   font-size: 1em;
 }
@@ -70,9 +72,8 @@ h1 {
   width: 100%;
 }
 
-.nav-item {
+/* .nav-item {
   align-self: center;
-  /* border: 2px solid red; */
   margin: 8px;
   padding: 0px;
   width: content;
@@ -82,13 +83,20 @@ h1 {
 .nav-item:active {
   text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
   color: black;
-}
+} */
 
 .nav-link {
+  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  align-self: center;
+  /* border: 2px solid red; */
+  margin: 8px;
+  padding: 0px;
+  width: content;
   text-decoration: none;
 }
 
 .nav-link:active {
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
   color: black;
 }
 .nav-link:visited {
@@ -104,6 +112,16 @@ h1 {
   text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
   /* background-color: none; */
   padding: 5px;
+}
+
+.generic-link {
+  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  text-decoration: none;
+}
+
+.generic-link:active {
+  color: rgb(157, 0, 0);
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
 }
 
 .nav-title-link:visited {

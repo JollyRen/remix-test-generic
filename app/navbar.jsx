@@ -1,51 +1,38 @@
-import { Link } from '@remix-run/react'
-import { useState } from 'react'
-
+import { NavLink, useLocation } from '@remix-run/react'
+import { navlinks } from './utils/index'
 const Navbar = ({ user, isLoggedIn }) => {
-  const [navlinks, setNavlinks] = useState([
-    { path: '/', text: 'Home', className: 'nav-link' },
-    { path: '/routines', text: 'Routines', className: 'nav-link' },
-    { path: '/activities', text: 'Activities', className: 'nav-link' },
-    { path: '/users/login', text: 'Login', className: 'nav-link' },
-    { path: '/users/profile', text: 'Profile', className: 'nav-link' }
-  ])
+  let location = useLocation()
 
-  const changeNavLink = (oldLinks, idx) =>
-    oldLinks.map((link, i) =>
-      idx == i ? (link.className = 'nav-link selected') : (link.className = 'nav-link')
-    )
-
-  const handleLogoNavChange = () => setNavlinks(changeNavLink(navlinks))
-
-  //map nav util
-  const mapNavCB = (link, idx) => {
-    const handleNavChange = () => setNavlinks(changeNavLink(navlinks, idx))
-    return (
-      <li className="nav-item" key={idx}>
-        <Link to={link.path} onClick={handleNavChange} className={link.className}>
-          {link.text}
-        </Link>
-      </li>
-    )
-  }
-
-  const filterNavCB = (link) =>
-    isLoggedIn && link.text == 'Login'
+  const navFilterCB = (link, idx) =>
+    isLoggedIn && (link.text == 'Login' || link.text == 'Register')
       ? false
       : !isLoggedIn && link.text == 'Profile'
       ? false
       : true
 
-  const mapNav = navlinks.filter(filterNavCB).map(mapNavCB)
+  const navMapCB = (link, idx) => {
+    const cPath = location.pathname == '/' ? 'home' : location.pathname
+    const lPath = link.path == '/' ? 'home' : link.path.slice(0, cPath.length)
+    // console.log(`currentPath/linkPath: '${cPath}' / '${lPath}'`)
+    const className = cPath == lPath ? 'nav-link selected' : 'nav-link'
+
+    return (
+      <NavLink key={idx} className={className} to={link.path}>
+        {link.text}
+      </NavLink>
+    )
+  }
+
+  let navMap = navlinks.filter(navFilterCB).map(navMapCB)
 
   return (
     <nav className="navbar">
       <h1 className="nav-title">
-        <Link className="nav-title-link" onClick={handleLogoNavChange} to="/">
+        <NavLink className="nav-title-link" to="/">
           FitnessTrackr
-        </Link>
+        </NavLink>
       </h1>
-      <ul className="nav-container">{mapNav}</ul>
+      <div className="nav-container">{navMap}</div>
     </nav>
   )
 }
