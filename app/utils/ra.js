@@ -24,26 +24,38 @@ export const updateRA = async ({ count, duration, raId }) => {
     //   count: int
     // }
     const error = {
-      error: updatedRA?.error || null,
-      message: updatedRA?.message || null,
-      name: updatedRA?.name || null
+      updatedRA: {
+        name: updatedRA?.name || null,
+        error: updatedRA?.error || null,
+        message: updatedRA?.message || null
+      }
     }
     const success = {
-      message: 'Updated count and duration',
-      updatedRA
+      updatedRA: {
+        name: 'successfullyUpdated',
+        message: 'Updated count and duration',
+        updatedRA
+      }
     }
     const unknownError = {
-      message: 'Could not update count and duration'
+      updatedRA: {
+        name: 'cannotUpdate',
+        error: 'cannotUpdate',
+        message: 'Could not update count and duration'
+      }
     }
 
-    if (updatedRA?.error) return error
-    if (updatedRA && Object.keys(updatedRA).length) return success
-    return unknownError
+    if (updatedRA.error) return error
+    if (!updatedRA.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return {
-      error,
-      message: error.detail
+      updatedRA: {
+        name: 'errorFetching',
+        error,
+        message: error.detail
+      }
     }
   }
 }
@@ -73,26 +85,38 @@ export const deleteRA = async ({ token, raId }) => {
     //   count: int
     // }
     const error = {
-      error: deletedRA?.error || null,
-      message: deletedRA?.message || null,
-      name: deletedRA?.name || null
+      deletedRA: {
+        error: deletedRA?.error || null,
+        message: deletedRA?.message || null,
+        name: deletedRA?.name || null
+      }
     }
     const success = {
-      message: 'Activity removed from routine',
-      deletedRA
+      deletedRA: {
+        name: 'successfulRemove',
+        message: 'Activity removed from routine',
+        deletedRA
+      }
     }
     const unknownError = {
-      message: 'Activity cannot be removed from routine. Try again later'
+      deletedRA: {
+        name: 'cannotRemove',
+        error: 'cannotRemove',
+        message: 'Activity cannot be removed from routine. Try again later'
+      }
     }
 
-    if (deletedRA?.error) return error
-    if (deletedRA && deletedRA.success == true) return success
-    return unknownError
+    if (deletedRA.error) return error
+    if (!deletedRA.success) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return {
-      error,
-      message: error.detail
+      deletedRA: {
+        name: 'errorFetching',
+        error,
+        message: error.detail
+      }
     }
   }
 }

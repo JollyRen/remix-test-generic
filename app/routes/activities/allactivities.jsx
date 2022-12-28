@@ -2,7 +2,9 @@ import { json } from '@remix-run/node'
 import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
 import { useEffect } from 'react'
 import { getActivities } from '~/utils'
-import SingleActivity from './$activityId'
+import SingleActivity from '~/components/activities/SingleActivity'
+
+// activities/allactivities
 
 export function CatchBoundary() {
   const caught = useCatch()
@@ -26,24 +28,13 @@ export function CatchBoundary() {
 
 export const loader = async ({ request }) => {
   const { activities } = await getActivities()
-  // console.log('getActivities:', activities)
-
   if (activities.error) throw json(activities, { status: 500, statusText: activities.message })
-  // const activityTest = []
-  // for (let i = 0; i < 10; i++) {
-  //   activityTest.push({
-  //     id: i,
-  //     name: `name${i}`,
-  //     description: `description${i}`
-  //   })
-  // }
 
-  // return json({ message: 'this is a test', activities: activityTest })
   return json(activities)
 }
 
 const AllActivities = () => {
-  const { setActivities, setRoutines, setError, setMessage } = useOutletContext()
+  const { setActivities, setRoutines, setError, setMessage, setSingleActivity } = useOutletContext()
 
   const loaderData = useLoaderData()
   // console.log('loaderData:', loaderData)
@@ -58,7 +49,12 @@ const AllActivities = () => {
   }
 
   const activityMapCB = (activity) => (
-    <SingleActivity key={activity.id} activity={activity} setRoutines={setRoutines} />
+    <SingleActivity
+      key={activity.id}
+      activity={activity}
+      setRoutines={setRoutines}
+      setSingleActivity={setSingleActivity}
+    />
   )
 
   // map for activities

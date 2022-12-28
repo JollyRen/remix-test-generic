@@ -40,8 +40,20 @@ export const getActivities = async () => {
       }
     }
 
-    const success = { activities: { message: 'Found Activities', activities } }
-    const unknownError = { activities: { message: 'No activities found', error: 'unknownError' } }
+    const success = {
+      activities: {
+        name: 'foundActivities',
+        message: 'Found Activities',
+        activities
+      }
+    }
+    const unknownError = {
+      activities: {
+        error: 'unknownError',
+        name: 'unknownError',
+        message: 'No activities found'
+      }
+    }
 
     if (activities?.error) return error
     //object {activities: {error: { name, error, message}}}
@@ -51,26 +63,38 @@ export const getActivities = async () => {
     //object {activities: {message, activities: []}}
   } catch (error) {
     console.error(error)
-    return { activities: { error, message: error.detail, name: 'fetchError' } }
+    return {
+      activities: {
+        error,
+        message: error.detail,
+        name: 'errorFetching'
+      }
+    }
   }
 }
 
 export const createActivity = async ({ name, description }) => {
   try {
-    const body = {
+    const body = JSON.stringify({
       name,
       description
-    }
+    })
 
     const req = {
       method: 'POST',
-      body: JSON.stringify(body)
+      body
     }
 
     const rawRes = await fetch(rCreateActivity, req)
 
     if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
+      return {
+        createdActivity: {
+          name: 'serverError',
+          error: 'serverError',
+          message: rawRes.statusText
+        }
+      }
 
     const createdActivity = await rawRes.json()
     console.log('created activity', createdActivity)
@@ -81,19 +105,39 @@ export const createActivity = async ({ name, description }) => {
     // }
 
     const error = {
-      name: createdActivity?.name || null,
-      error: createdActivity?.error || null,
-      message: createdActivity?.message || null
+      createdActivity: {
+        name: createdActivity?.name || null,
+        error: createdActivity?.error || null,
+        message: createdActivity?.message || null
+      }
     }
-    const success = { message: 'Activity Created', activity: createdActivity }
-    const unknownError = { message: 'No activity created' }
+    const success = {
+      createdActivity: {
+        name: 'activityCreated',
+        message: 'Activity Created',
+        activity: createdActivity
+      }
+    }
+    const unknownError = {
+      createdActivity: {
+        name: 'noActivity',
+        error: 'noActivity',
+        message: 'No activity created'
+      }
+    }
 
-    if (createdActivity?.error) return error
-    if (createdActivity && Object.keys(createdActivity).length) return success
-    return unknownError
+    if (createdActivity.error) return error
+    if (!createdActivity.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
-    return { error, message: error.detail }
+    return {
+      createdActivity: {
+        name: 'errorFetching',
+        error,
+        message: error.detail
+      }
+    }
   }
 }
 
@@ -116,19 +160,33 @@ export const updateActivity = async ({ name = null, description = null, activity
     // }
 
     const error = {
-      name: updatedActivity?.name || null,
-      error: updatedActivity?.error || null,
-      message: updatedActivity?.message || null
+      updatedActivity: {
+        name: updatedActivity?.name || null,
+        error: updatedActivity?.error || null,
+        message: updatedActivity?.message || null
+      }
     }
-    const success = { message: 'Activity Updated', activity: updatedActivity }
+    const success = {
+      updatedActivity: {
+        name: 'updatedActivity',
+        message: 'Activity Updated',
+        activity: updatedActivity
+      }
+    }
     const unknownError = { message: 'Failed to update activity' }
 
-    if (updatedActivity?.error) return error
-    if (updatedActivity && Object.keys(updatedActivity).length) return success
-    return unknownError
+    if (updatedActivity.error) return error
+    if (!updatedActivity.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
-    return { error, message: error.detail }
+    return {
+      updatedActivity: {
+        name: 'errorFetching',
+        error,
+        message: error.detail
+      }
+    }
   }
 }
 
@@ -158,7 +216,7 @@ export const getRoutinesByActivity = async ({ activityId }) => {
     //     id: int,
     //     name: string,
     //     description: string,
-    //     duration: 8,
+    //     duration: int,
     //     count: int,
     //     routineActivityId: int,
     //     routineId: int
@@ -171,14 +229,32 @@ export const getRoutinesByActivity = async ({ activityId }) => {
         message: routines?.message || null
       }
     }
-    const success = { routines: { message: 'Routines found', routines } }
-    const unknownError = { routines: { message: 'No routines found', error: 'noRoutines' } }
+    const success = {
+      routines: {
+        name: 'foundRoutines',
+        message: 'Routines found',
+        routines
+      }
+    }
+    const unknownError = {
+      routines: {
+        name: 'noRoutinesFound',
+        message: 'No routines found',
+        error: 'noRoutines'
+      }
+    }
 
     if (routines?.error) return error
-    if (!routines) return unknownError
+    if (!routines.length) return unknownError
     return success
   } catch (error) {
     console.error(error)
-    return { error, message: error.detail }
+    return {
+      routines: {
+        name: 'errorFetching',
+        error,
+        message: error.detail
+      }
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { routines } from './routes'
 import { fetchWithAbort } from './index.js'
+import { server } from 'remix.config'
 
 const {
   rGetRoutines,
@@ -14,14 +15,13 @@ const {
 
 export const getRoutines = async () => {
   try {
-    const method = 'GET'
-    const headers = { 'Content-Type': 'application/json' }
-    const req = { method, headers }
+    const rawRes = await fetchWithAbort(rGetRoutines, 5000)
+    //server error check
+    // console.log(response)
 
-    const rawRes = await fetch(rGetRoutines, req)
-
-    if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
+    if (rawRes.error) {
+      return { routines: rawRes }
+    }
 
     const routines = await rawRes.json()
     console.log('routines: ', routines)
@@ -43,26 +43,43 @@ export const getRoutines = async () => {
     //   }
     // }
     const error = {
-      error: routines?.error || null,
-      name: routines?.name || null,
-      message: routines?.message || null
+      routines: {
+        error: routines?.error || null,
+        name: routines?.name || null,
+        message: routines?.message || null
+      }
     }
     const success = {
-      message: 'Found routines',
-      routines
+      routines: {
+        name: 'foundRoutines',
+        message: 'Found routines',
+        routines
+      }
     }
-    const unknownError = { message: 'No routines found' }
+    const unknownError = {
+      routines: {
+        error: 'noRoutines',
+        name: 'noRoutines',
+        message: 'No routines found'
+      }
+    }
 
-    if (routines?.error) return error
-    if (routines?.length) return success
-    return unknownError
+    if (routines.error) return error
+    if (!routines.length) return unknownError
+    return success
   } catch (error) {
     console.error(error)
-    return { error, message: error.detail }
+    return {
+      routines: {
+        error,
+        name: 'errorFetching',
+        message: error.detail
+      }
+    }
   }
 }
 
-export const createRoutine = async ({ name, goal, isPublic = null }) => {
+export const createRoutine = async ({ name, goal, isPublic = true }) => {
   try {
     const body = JSON.stringify({ name, goal, isPublic })
     const headers = { 'Content-Type': 'application/json' }
@@ -70,9 +87,16 @@ export const createRoutine = async ({ name, goal, isPublic = null }) => {
 
     const rawRes = await fetch(rCreateRoutine, req)
 
-    if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
-
+    if (rawRes.status >= 500 && rawRes.status <= 599) {
+      const serverError = {
+        createdRoutine: {
+          name: 'serverError',
+          error: 'serverError',
+          message: rawRes.statusText
+        }
+      }
+      return serverError
+    }
     const createdRoutine = await rawRes.json()
     console.log('created routines', createdRoutine)
     // createdRoutine: Object{
@@ -84,24 +108,37 @@ export const createRoutine = async ({ name, goal, isPublic = null }) => {
     // }
 
     const error = {
-      error: createdRoutine?.error || null,
-      name: createdRoutine?.name || null,
-      message: createdRoutine?.message || null
+      createdRoutine: {
+        error: createdRoutine?.error || null,
+        name: createdRoutine?.name || null,
+        message: createdRoutine?.message || null
+      }
     }
     const success = {
-      message: `Created routine ${createdRoutine.name} successfully`,
-      createdRoutine
+      createdRoutine: {
+        message: `Created routine ${createdRoutine.name} successfully`,
+        createdRoutine
+      }
     }
-    const unknownError = { message: 'Could not create routine' }
+    const unknownError = {
+      createdRoutine: {
+        name: 'unknownError',
+        error: 'unknownError',
+        message: 'Could not create routine'
+      }
+    }
 
-    if (createdRoutine?.error) return error
-    if (createdRoutine && Object.keys(createdRoutine).length) return success
-    return unknownError
+    if (createdRoutine.error) return error
+    if (!createdRoutine.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return {
-      error,
-      message: error.detail
+      createdRoutine: {
+        name: 'errorFetching',
+        error,
+        message: error.detail
+      }
     }
   }
 }
@@ -114,8 +151,16 @@ export const updateRoutine = async ({ name = null, goal = null, routineId, isPub
 
     const rawRes = await fetch(rUpdateRoutine(routineId), req)
 
-    if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
+    if (rawRes.status >= 500 && rawRes.status <= 599) {
+      const serverError = {
+        updatedRoutine: {
+          name: 'serverError',
+          error: 'serverError',
+          message: rawRes.statusText
+        }
+      }
+      return serverError
+    }
 
     const updatedRoutine = await rawRes.json()
     console.log('updated routine: ', updatedRoutine)
@@ -128,24 +173,36 @@ export const updateRoutine = async ({ name = null, goal = null, routineId, isPub
     //   goal: String
     // }
     const error = {
-      error: updatedRoutine?.error || null,
-      name: updatedRoutine?.name || null,
-      message: updatedRoutine?.message || null
+      updatedRoutine: {
+        error: updatedRoutine?.error || null,
+        name: updatedRoutine?.name || null,
+        message: updatedRoutine?.message || null
+      }
     }
     const success = {
-      message: 'Successfully updated routine',
-      updatedRoutine
+      updatedRoutine: {
+        message: 'Successfully updated routine',
+        updatedRoutine
+      }
     }
-    const unknownError = { message: 'Could not update routine' }
+    const unknownError = {
+      updatedRoutine: {
+        error: 'unknownError',
+        message: 'Could not update routine'
+      }
+    }
 
-    if (updatedRoutine?.error) return error
-    if (updatedRoutine && Object.keys(updatedRoutine).length) return success
-    return unknownError
+    if (updatedRoutine.error) return error
+    if (!updatedRoutine.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return {
-      error,
-      message: error.detail
+      updatedRoutine: {
+        name: 'error in request',
+        error,
+        message: error.detail
+      }
     }
   }
 }
@@ -164,8 +221,16 @@ export const deleteRoutine = async ({ token, routineId }) => {
 
     const rawRes = await fetch(rDeleteRoutine(routineId), req)
 
-    if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
+    if (rawRes.status >= 500 && rawRes.status <= 599) {
+      const serverError = {
+        deletedRoutine: {
+          error: 'serverError',
+          message: rawRes.statusText,
+          name: 'serverError'
+        }
+      }
+      return serverError
+    }
 
     const deletedRoutine = await rawRes.json()
     console.log('deleted routine: ', deletedRoutine)
@@ -178,25 +243,36 @@ export const deleteRoutine = async ({ token, routineId }) => {
     //   name: string,
     //   goal: string
     // }
-    const noSuccess = {
-      error: deletedRoutine?.error || null,
-      name: deletedRoutine?.name || null,
-      message: deletedRoutine?.message || null
+    const error = {
+      deletedRoutine: {
+        error: deletedRoutine?.error || null,
+        name: deletedRoutine?.name || null,
+        message: deletedRoutine?.message || null
+      }
     }
     const success = {
-      message: 'Successfully deleted routine',
-      deletedRoutine
+      deletedRoutine: {
+        message: 'Successfully deleted routine',
+        deletedRoutine
+      }
     }
-    const unknownError = { message: 'Could not delete routine' }
+    const unknownError = {
+      deletedRoutine: {
+        message: 'Could not delete routine',
+        error: 'unknownError'
+      }
+    }
 
-    if (!deletedRoutine?.success) return noSuccess
-    if (deletedRoutine?.success) return success
-    return unknownError
+    if (deletedRoutine.error) return error
+    if (!deletedRoutine.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return {
-      error,
-      message: error.detail
+      deletedRoutine: {
+        error,
+        message: error.detail
+      }
     }
   }
 }
@@ -210,8 +286,16 @@ export const attachActToRoutine = async ({ activityId, count, duration, routineI
 
     const rawRes = await fetch(rAttachActToRoutine(routineId), req)
 
-    if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
+    if (rawRes.status >= 500 && rawRes.status <= 599) {
+      const serverError = {
+        attachedAct: {
+          error: 'serverError',
+          message: rawRes.statusText,
+          name: 'serverError'
+        }
+      }
+      return serverError
+    }
 
     const attachedAct = await rawRes.json()
     console.log('attached act to routine: ', attachedAct)
@@ -223,26 +307,35 @@ export const attachActToRoutine = async ({ activityId, count, duration, routineI
     //   count: int
     // }
     const error = {
-      error: attachedAct.error,
-      name: attachedAct.name,
-      message: attachedAct.message
+      attachedAct: {
+        error: attachedAct.error,
+        name: attachedAct.name,
+        message: attachedAct.message
+      }
     }
     const success = {
-      message: 'Attached activity to routine',
-      attachedAct
+      attachedAct: {
+        message: 'Attached activity to routine',
+        attachedAct
+      }
     }
     const unknownError = {
-      message: 'Could not attach activity to routine'
+      attachedAct: {
+        error: 'unknownError',
+        message: 'Could not attach activity to routine'
+      }
     }
 
-    if (attachedAct?.error) return error
-    if (attachedAct && Object.keys(attachedAct).length) return success
-    return unknownError
+    if (attachedAct.error) return error
+    if (!attachedAct.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return {
-      error,
-      message: error.detail
+      attachedAct: {
+        error,
+        message: error.detail
+      }
     }
   }
 }

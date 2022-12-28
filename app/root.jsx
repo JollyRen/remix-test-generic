@@ -1,5 +1,5 @@
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
-import Navbar from './navbar.jsx'
+import Navbar from './components/navbar.jsx'
 import { useState } from 'react'
 import globalStyles from '~/styles/global.css'
 
@@ -23,16 +23,10 @@ export const links = () => [
 export default function App() {
   const [user, setUser] = useState({})
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [publicRoutines, setPublicRoutines] = useState([])
-  const [publicActivities, setPublicActivities] = useState([])
-  const [token, setToken] = useState('')
 
   const contextObject = {
     userState: [user, setUser],
-    isLoggedInState: [isLoggedIn, setIsLoggedIn],
-    routineState: [publicRoutines, setPublicRoutines],
-    activityState: [publicActivities, setPublicActivities],
-    tokenState: [token, setToken]
+    isLoggedInState: [isLoggedIn, setIsLoggedIn]
   }
   return (
     <Doc>

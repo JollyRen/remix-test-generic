@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from '@remix-run/react'
-import { navlinks } from './utils/index'
+import { navlinks } from '../utils/index'
 const Navbar = ({ user, isLoggedIn }) => {
   let location = useLocation()
 
