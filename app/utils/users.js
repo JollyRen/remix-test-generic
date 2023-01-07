@@ -92,8 +92,8 @@ export const getUserPubRoutines = async ({ username }) => {
   }
 }
 
-export const regOrLoginUser = async ({ username, password, action }) => {
-  let url = action == 'reg' ? rRegister : rLogin
+export const regOrLoginUser = async ({ username, password, _action, token }) => {
+  let url = _action == 'reg' ? rRegister : rLogin
 
   try {
     const method = 'POST'

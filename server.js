@@ -20,8 +20,8 @@ app.use('/build', express.static('public/build', { immutable: true, maxAge: '1y'
 // more aggressive with this caching.
 app.use(express.static('public', { maxAge: '1h' }))
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+// app.use(express.json())
+// app.use(express.urlencoded({ extended: false }))
 
 app.use(morgan('dev'))
 

@@ -1,12 +1,5 @@
 import { json, redirect } from '@remix-run/node'
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useOutletContext,
-  useNavigate,
-  useSearchParams
-} from '@remix-run/react'
+import { Form, useActionData, useOutletContext, useNavigate } from '@remix-run/react'
 import { useEffect, useState } from 'react'
 import { regOrLoginUser } from '../../utils/index.js'
 
@@ -16,15 +9,29 @@ import { regOrLoginUser } from '../../utils/index.js'
 
 export const action = async ({ request }) => {
   const formData = await request.formData()
+  console.log(formData)
+  for (const [key, value] of formData.entries()) {
+    console.log(key, value)
+  }
   const { _action, username, password } = Object.fromEntries(formData)
-  const { user, message, token, error, name } = await regOrLoginUser(username, password, _action)
-  if (error) return { name, error, message }
-  if (token.length) return { user, token, message }
-  return { error: 'noTokenNoUser', message: 'No token made or user found!' }
+  console.log(_action, username, password)
+  try {
+    if (!username)
+      return json({ error: 'noUsername', message: 'No username given, please enter one' })
+    if (password.length < 8)
+      return json({
+        error: 'passwordTooShort',
+        message: 'Password is too short, it must be 8 characters or longer'
+      })
+    const { user, message, token, error, name } = await regOrLoginUser(username, password, _action)
+    if (error) return json({ name, error, message })
+    if (token.length) return json({ user, token, message })
+  } catch (error) {
+    return json({ error: 'noTokenNoUser', message: 'No token made or user found!' })
+  }
 }
 
 function Login() {
-  const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const actionData = useActionData()
   const [error, setError] = useState('')
@@ -52,11 +59,16 @@ function Login() {
     }
   }, [actionData])
 
+  useEffect(() => {
+    isLoggedIn && navigate('/users')
+  }, [isLoggedIn])
+
   const handleIsRegister = () => {
-    if (params.get('register')) setParams('register=false')
-    else setParams('register=true')
     setIsRegister(!isRegister)
+    navigate(`/users/login?register=${!isRegister}`)
   }
+
+  //abstracted parts of jsx
 
   const registerToggle = !isRegister ? (
     <p>
@@ -76,22 +88,24 @@ function Login() {
     </p>
   )
 
+  const messages = (error || message) && (
+    <p>
+      <span style={{ color: 'red' }}>{message}</span>
+    </p>
+  )
+
   return (
     <div>
       {isRegister ? 'Register' : 'Log In'}
-      <Form method="post">
-        <input type="text" name="username" placeholder="superMuffinMan" required></input>
-        <input type="password" name="password" placeholder="8 characters pls" required></input>
+      <Form method="post" action="/users/login">
+        <input type="text" name="username" placeholder="superMuffinMan"></input>
+        <input type="password" name="password" placeholder="8 characters pls"></input>
         <button type="submit" name="_action" value={isRegister ? 'reg' : ''}>
           {isRegister ? 'Register' : 'Log In'}
         </button>
-        {error && <p style={{ color: 'red' }}>{message}</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
       </Form>
-      {(error || message) && (
-        <p>
-          <span style={{ color: 'red' }}>{message}</span>
-        </p>
-      )}
+      {messages}
       {registerToggle}
     </div>
   )
