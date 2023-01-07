@@ -4,8 +4,10 @@ import { navlinks } from '../utils/index'
 
 const Navbar = ({ localState }) => {
   const {
-    isLoggedInState: [isLoggedIn],
-    registerState: [isRegister, setIsRegister]
+    userState: [user, setUser],
+    isLoggedInState: [isLoggedIn, setIsLoggedIn],
+    tokenState: [token, setToken],
+    registerState: [isRegister]
   } = localState
 
   let location = useLocation()
@@ -45,6 +47,13 @@ const Navbar = ({ localState }) => {
 
   let navMap = navlinks.filter(navFilterCB).map(navMapCB)
 
+  const handleLogOut = () => {
+    setToken('')
+    setUser({})
+    setIsLoggedIn(false)
+    localStorage.removeItem('token')
+  }
+
   return (
     <nav className="navbar">
       <h1 className="nav-title">
@@ -52,7 +61,14 @@ const Navbar = ({ localState }) => {
           FitnessTrackr
         </NavLink>
       </h1>
-      <div className="nav-container">{navMap}</div>
+      <div className="nav-container">
+        {navMap}
+        {isLoggedIn && (
+          <NavLink to="/" className="nav-link" onClick={handleLogOut}>
+            Log Out
+          </NavLink>
+        )}
+      </div>
     </nav>
   )
 }

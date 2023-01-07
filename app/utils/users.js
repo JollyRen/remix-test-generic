@@ -21,23 +21,37 @@ export const getUser = async ({ token }) => {
       return { error: 'serverError', message: rawRes.statusText }
 
     const user = await rawRes.json()
-    console.log(user)
+    // console.log(user)
     // Object {
     //   id: int,
     //   username: string
     // }
 
     const error = {
-      name: user?.name || null,
-      error: user?.error || null,
-      message: user?.message || null
+      user: {
+        name: user?.name || null,
+        error: user?.error || null,
+        message: user?.message || null
+      }
     }
-    const success = { message: "Here's the user", user }
-    const unknownError = { message: 'Could not get user' }
+    const success = {
+      user: {
+        name: 'foundUser',
+        message: 'Got your user!',
+        user: user
+      }
+    }
+    const unknownError = {
+      user: {
+        name: 'unknownError',
+        error: 'unknownError',
+        message: 'cannot find or create user with that combination of username and password'
+      }
+    }
 
-    if (user?.error) return error
-    if (user && Object.keys(user).length) return success
-    return unknownError
+    if (user.error) return error
+    if (!user.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
     return { error, message: error.detail }
@@ -76,23 +90,43 @@ export const getUserPubRoutines = async ({ username }) => {
     //   }
     // }
     const error = {
-      name: userPubRoutines?.name || null,
-      error: userPubRoutines?.error || null,
-      message: userPubRoutines?.message || null
+      userRoutines: {
+        name: userPubRoutines?.name || null,
+        error: userPubRoutines?.error || null,
+        message: userPubRoutines?.message || null
+      }
     }
-    const success = { message: 'Found Public Routines by User', userPubRoutines }
-    const unknownError = { message: `cannot find public routines by user ${username}` }
+    const success = {
+      userRoutines: {
+        name: 'successUserRoutines!',
+        message: 'Found Public Routines by User',
+        userPubRoutines
+      }
+    }
+    const unknownError = {
+      userRoutines: {
+        name: 'unknownError',
+        error: 'unknownError',
+        message: `cannot find public routines by user ${username}`
+      }
+    }
 
     if (userPubRoutines?.error) return error
-    if (userPubRoutines && userPubRoutines.length) return success
-    return unknownError
+    if (!userPubRoutines.length) return unknownError
+    return success
   } catch (error) {
     console.error(error)
-    return { error, message: error.detail }
+    return {
+      userRoutines: {
+        name: 'errorFetching',
+        error,
+        message: error.detail
+      }
+    }
   }
 }
 
-export const regOrLoginUser = async ({ username, password, _action, token }) => {
+export const regOrLoginUser = async ({ username, password, _action }) => {
   let url = _action == 'reg' ? rRegister : rLogin
 
   try {
@@ -105,10 +139,10 @@ export const regOrLoginUser = async ({ username, password, _action, token }) => 
     const rawRes = await fetch(url, req)
 
     if (rawRes.status >= 500 && rawRes.status <= 599)
-      return { error: 'serverError', message: rawRes.statusText }
+      return { user: { error: 'serverError', message: rawRes.statusText } }
 
     const loggedInUser = await rawRes.json()
-    console.log('this is user response', loggedInUser)
+    // console.log('this is user response', loggedInUser)
     // Object  {
     //   user: Object {
     //     id: int,
@@ -118,20 +152,32 @@ export const regOrLoginUser = async ({ username, password, _action, token }) => 
     //   token: string
     // }
     const error = {
-      name: loggedInUser?.name || null,
-      error: loggedInUser?.error || null,
-      message: loggedInUser?.message || null
+      user: {
+        name: loggedInUser?.name || null,
+        error: loggedInUser?.error || null,
+        message: loggedInUser?.message || null
+      }
     }
-    const success = loggedInUser
+    const success = {
+      user: {
+        name: 'foundUser',
+        message: loggedInUser.message,
+        user: loggedInUser.user,
+        token: loggedInUser.token
+      }
+    }
     const unknownError = {
-      message: 'cannot find or create user with that combination of username and password'
+      user: {
+        error: 'unknownError',
+        message: 'cannot find or create user with that combination of username and password'
+      }
     }
 
-    if (loggedInUser?.error) return error
-    if (loggedInUser && loggedInUser?.token) return success
-    return unknownError
+    if (loggedInUser.error) return error
+    if (!loggedInUser.user.id) return unknownError
+    return success
   } catch (error) {
     console.error(error)
-    return { error, message: error.detail }
+    return { user: { error, message: error.detail } }
   }
 }

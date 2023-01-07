@@ -6,17 +6,23 @@ const Index = () => {
   const {
     userState: [user, setUser],
     isLoggedInState: [isLoggedIn, setIsLoggedIn],
-    tokenState: [token, setToken]
+    tokenState: [token, setToken],
+    registerState: [isRegister, setIsRegister]
   } = useOutletContext()
 
   useEffect(() => {
-    if (!isLoggedIn) navigate('/users/login?register=false')
+    if (!isLoggedIn) setTimeout(() => navigate('/users/login?register=false'), 1500)
+    setIsRegister(false)
   }, [])
 
-  return (
+  return isLoggedIn ? (
     <section>
       <h1>profile</h1>
       <p>Here's your profile</p>
+    </section>
+  ) : (
+    <section>
+      <p>Not logged in... Redirecting.</p>
     </section>
   )
 }

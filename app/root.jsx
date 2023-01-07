@@ -8,8 +8,9 @@ import {
   useSearchParams
 } from '@remix-run/react'
 import Navbar from './components/navbar.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import globalStyles from '~/styles/global.css'
+import { getUser } from './utils/users.js'
 
 export const meta = () => ({
   charset: 'utf-8',
@@ -34,6 +35,20 @@ export default function App() {
   const [user, setUser] = useState({})
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [token, setToken] = useState('')
+
+  useEffect(() => {
+    const localToken = localStorage.getItem('token')
+    if (localToken) {
+      setToken(localToken)
+      setIsLoggedIn(true)
+      const userFromToken = async () => {
+        const { user: fetchedUser } = await getUser({ token: localToken })
+        // console.log(fetchedUser.message)
+        setUser(fetchedUser.user)
+      }
+      userFromToken()
+    }
+  }, [])
 
   const contextObject = {
     userState: [user, setUser],
