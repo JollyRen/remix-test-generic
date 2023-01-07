@@ -25,7 +25,7 @@ export default [
     text: 'Register'
   },
   {
-    path: '/users/profile',
+    path: '/users',
     className: 'nav-link',
     text: 'Profile'
   }

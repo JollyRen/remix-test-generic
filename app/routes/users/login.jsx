@@ -27,13 +27,13 @@ function Login() {
   const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const actionData = useActionData()
-  const [isRegister, setIsRegister] = useState(params.get('register') || false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const {
     userState: [user, setUser],
     isLoggedInState: [isLoggedIn, setIsLoggedIn],
-    tokenState: [token, setToken]
+    tokenState: [token, setToken],
+    registerState: [isRegister, setIsRegister]
   } = useOutletContext()
 
   useEffect(() => {
@@ -53,7 +53,7 @@ function Login() {
   }, [actionData])
 
   const handleIsRegister = () => {
-    if (params.get('register')) setParams('')
+    if (params.get('register')) setParams('register=false')
     else setParams('register=true')
     setIsRegister(!isRegister)
   }

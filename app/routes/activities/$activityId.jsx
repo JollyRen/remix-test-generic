@@ -23,7 +23,7 @@ export const action = async ({ request, params }) => {
     return json(activity)
   }
 
-  return null
+  return json({})
 }
 
 // loaders only happen on "GET"

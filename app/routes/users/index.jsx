@@ -1,4 +1,5 @@
 import { useNavigate, useOutletContext } from '@remix-run/react'
+import { useEffect } from 'react'
 
 const Index = () => {
   const navigate = useNavigate()
@@ -8,7 +9,9 @@ const Index = () => {
     tokenState: [token, setToken]
   } = useOutletContext()
 
-  if (!isLoggedIn) navigate('/users/login')
+  useEffect(() => {
+    if (!isLoggedIn) navigate('/users/login?register=false')
+  }, [])
 
   return (
     <section>

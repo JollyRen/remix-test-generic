@@ -71,9 +71,7 @@ function Activities() {
     setMessage
   }
 
-  const handleIsNav = () => {
-    setIsNav(!isNav)
-  }
+  const handleIsNav = () => setIsNav(!isNav)
 
   console.log(singleActivity)
   return (

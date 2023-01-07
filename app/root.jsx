@@ -1,4 +1,12 @@
-import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
+import {
+  Links,
+  LiveReload,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useSearchParams
+} from '@remix-run/react'
 import Navbar from './components/navbar.jsx'
 import { useState } from 'react'
 import globalStyles from '~/styles/global.css'
@@ -21,16 +29,22 @@ export const links = () => [
 ]
 
 export default function App() {
+  const [params, setParams] = useSearchParams()
+  const [isRegister, setIsRegister] = useState(params.get('register') ?? false)
   const [user, setUser] = useState({})
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [token, setToken] = useState('')
 
   const contextObject = {
     userState: [user, setUser],
-    isLoggedInState: [isLoggedIn, setIsLoggedIn]
+    isLoggedInState: [isLoggedIn, setIsLoggedIn],
+    tokenState: [token, setToken],
+    registerState: [isRegister, setIsRegister]
   }
+
   return (
     <Doc>
-      <Layout user={user} isLoggedIn={isLoggedIn}>
+      <Layout localState={contextObject}>
         <Outlet context={contextObject} />
       </Layout>
     </Doc>
@@ -54,10 +68,10 @@ export const Doc = ({ children }) => {
   )
 }
 
-export const Layout = ({ children, user, isLoggedIn }) => {
+export const Layout = ({ children, localState }) => {
   return (
     <div className="layout-container">
-      <Navbar user={user} isLoggedIn={isLoggedIn} />
+      <Navbar localState={localState} />
       {children}
       <Footer />
     </div>
