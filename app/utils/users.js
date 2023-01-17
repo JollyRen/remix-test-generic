@@ -71,7 +71,7 @@ export const getUserPubRoutines = async ({ username }) => {
       return { error: 'serverError', message: rawRes.statusText }
 
     const userPubRoutines = await rawRes.json()
-    console.log('users public routines: ', userPubRoutines)
+    // console.log('users public routines: ', userPubRoutines)
     // Array{
     //   id: int,
     //   creatorId: int,
@@ -112,7 +112,7 @@ export const getUserPubRoutines = async ({ username }) => {
     }
 
     if (userPubRoutines?.error) return error
-    if (!userPubRoutines.length) return unknownError
+    if (!userPubRoutines) return unknownError
     return success
   } catch (error) {
     console.error(error)

@@ -1,5 +1,4 @@
 import { rA } from './routes'
-import { fetchWithAbort } from './index.js'
 
 const { rUpdateRA, rDeleteRA } = rA //both fn (raId)
 

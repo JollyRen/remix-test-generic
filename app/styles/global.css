@@ -2,7 +2,7 @@
 
 body {
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh-50px);
 }
 
 h1,
@@ -130,4 +130,13 @@ h1 {
 
 .selected:visited {
   color: rgb(157, 0, 0);
+}
+
+.footer-container {
+  background: white;
+  width: 100%;
+  height: 50px;
+  position: fixed;
+  bottom: 0;
+  z-index: 1;
 }

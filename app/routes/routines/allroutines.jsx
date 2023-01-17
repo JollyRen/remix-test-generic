@@ -4,6 +4,16 @@ import { useCatch, useLoaderData, useActionData, useOutletContext } from '@remix
 import SingleRoutine from '~/components/routines/SingleRoutine'
 import { getRoutines, createRoutine } from '~/utils'
 
+export function ErrorBoundary({ error }) {
+  console.error(error)
+  return (
+    <div>
+      <p>Uh oh! There's an Error!</p>
+      <p>{error.detail}</p>
+    </div>
+  )
+}
+
 export function CatchBoundary() {
   const caught = useCatch()
   const { error, name, message } = caught.data
@@ -90,8 +100,15 @@ const AllRoutines = () => {
     loaderMessage = loaderData.message || ''
   }
 
-  const routineCB = (routine) => {
-    return <SingleRoutine key={routine.id} routine={routine} localState={localState} />
+  const routineCB = (routine, idx) => {
+    return (
+      <SingleRoutine
+        key={routine.id}
+        routine={routine}
+        localState={localState}
+        last={idx == routArr.length - 1 ? true : false}
+      />
+    )
   }
 
   const routineMap = routArr.map(routineCB)

@@ -10,7 +10,7 @@ import {
 import Navbar from './components/navbar.jsx'
 import { useEffect, useState } from 'react'
 import globalStyles from '~/styles/global.css'
-import { getUser } from './utils/users.js'
+import { getUser, getUserPubRoutines } from './utils/users.js'
 
 export const meta = () => ({
   charset: 'utf-8',
@@ -35,6 +35,15 @@ export default function App() {
   const [user, setUser] = useState({})
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [token, setToken] = useState('')
+  const [userRoutines, setUserRoutines] = useState([])
+
+  const contextObject = {
+    userState: [user, setUser],
+    isLoggedInState: [isLoggedIn, setIsLoggedIn],
+    tokenState: [token, setToken],
+    registerState: [isRegister, setIsRegister],
+    userRoutinesState: [userRoutines, setUserRoutines]
+  }
 
   useEffect(() => {
     const localToken = localStorage.getItem('token')
@@ -44,18 +53,21 @@ export default function App() {
       const userFromToken = async () => {
         const { user: fetchedUser } = await getUser({ token: localToken })
         // console.log(fetchedUser.message)
-        setUser(fetchedUser.user)
+        if (fetchedUser) {
+          if (fetchedUser.error) console.error(fetchedUser)
+          setUser(fetchedUser.user)
+          const { userRoutines: fetchedRoutines } = await getUserPubRoutines({
+            username: fetchedUser.user.username
+          })
+          if (fetchedRoutines) {
+            if (fetchedRoutines.error) console.error(fetchedRoutines)
+            setUserRoutines(fetchedRoutines.userPubRoutines)
+          }
+        }
       }
       userFromToken()
     }
   }, [])
-
-  const contextObject = {
-    userState: [user, setUser],
-    isLoggedInState: [isLoggedIn, setIsLoggedIn],
-    tokenState: [token, setToken],
-    registerState: [isRegister, setIsRegister]
-  }
 
   return (
     <Doc>
@@ -96,7 +108,7 @@ export const Layout = ({ children, localState }) => {
 export const Footer = () => {
   return (
     <div className="footer-container">
-      <p>I'm the footer</p>
+      <p>Jeremy Rogers ©️2023</p>
     </div>
   )
 }

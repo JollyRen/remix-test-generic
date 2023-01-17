@@ -24,7 +24,7 @@ export const getRoutines = async () => {
     }
 
     const routines = await rawRes.json()
-    console.log('routines: ', routines)
+    // console.log('routines: ', routines)
     // Array{
     //   id: int,
     //   creatorId: int,

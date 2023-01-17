@@ -1,5 +1,15 @@
 import { useNavigate, useOutletContext } from '@remix-run/react'
 import { useEffect } from 'react'
+import { getUserPubRoutines } from '~/utils'
+
+export const errorBoundary = ({ error }) => {
+  console.error(error)
+  return (
+    <div>
+      <p>error: {error}</p>
+    </div>
+  )
+}
 
 const Index = () => {
   const navigate = useNavigate()
@@ -7,7 +17,8 @@ const Index = () => {
     userState: [user, setUser],
     isLoggedInState: [isLoggedIn, setIsLoggedIn],
     tokenState: [token, setToken],
-    registerState: [isRegister, setIsRegister]
+    registerState: [isRegister, setIsRegister],
+    userRoutinesState: [userRoutines, setUserRoutines]
   } = useOutletContext()
 
   useEffect(() => {
@@ -19,6 +30,17 @@ const Index = () => {
     <section>
       <h1>profile</h1>
       <p>Here's your profile</p>
+      <p>
+        <strong>Username:</strong> {user.username}
+      </p>
+      <h2>User's Routines: </h2>
+      {!userRoutines.length ? (
+        <p>No Routines yet, make some</p>
+      ) : (
+        userRoutines.map((routine) => {
+          return <section key={routine.id}></section>
+        })
+      )}
     </section>
   ) : (
     <section>

@@ -1,10 +1,9 @@
 import { json } from '@remix-run/node'
 import { updateRA, deleteRA } from '~/utils'
 
-export const action = async ({ request }) => {
-  const formData = request.formData()
+export const action = async ({ request, params }) => {
+  const formData = await request.formData()
   const { _action, ...data } = Object.fromEntries(formData)
-
   //if no actions
   if (!_action)
     throw json({
@@ -15,9 +14,9 @@ export const action = async ({ request }) => {
 
   // actions
   if (_action == 'deleteRA') {
-    const token = 'requireUser' //placeholder
-    const { raId } = data
+    const { raId, token } = data
     const deletedRA = await deleteRA({ token, raId })
+    console.log('deletedRA', deletedRA)
 
     if (deletedRA.error) throw json(deletedRA)
 
@@ -27,6 +26,7 @@ export const action = async ({ request }) => {
   if (_action == 'updateRA') {
     const { count, duration, raId } = data
     const updatedRA = await updateRA({ count, duration, raId })
+    console.log('updatedRA', updatedRA)
 
     if (updatedRA.error) throw json(updatedRA)
 

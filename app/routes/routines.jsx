@@ -1,11 +1,12 @@
-import { Link, Outlet, useCatch, useFetcher } from '@remix-run/react'
+import { Link, Outlet, useCatch, useFetcher, useActionData } from '@remix-run/react'
 import { json } from '@remix-run/node'
 import { useEffect, useState } from 'react'
-import { createRoutine } from '~/utils'
+import { createRoutine, attachActToRoutine } from '~/utils'
 //comps
 import SelectedRoutine from '~/components/routines/SelectedRoutine'
 import NewRoutine from '~/components/routines/NewRoutine'
 import NoRoutines from '~/components/routines/NoRoutines'
+import SingleSearchedAct from '~/components/routines/SingleSearchedAct'
 
 export function CatchBoundary() {
   const caught = useCatch()
@@ -29,6 +30,7 @@ export function CatchBoundary() {
 
 export const action = async ({ request }) => {
   const formData = await request.formData()
+  console.log(formData)
   const { _action, ...data } = Object.fromEntries(formData)
 
   // throw if no actions
@@ -40,10 +42,18 @@ export const action = async ({ request }) => {
 
   // actions
   if (_action == 'createRoutine') {
-    // const {} = data
-    // const { createdRoutine } = await createRoutine({})
-    // if (createdRoutine.error) throw json(createdRoutine)
-    // return json(createdRoutine)
+    const { name, goal, isPublic } = data
+    const { createdRoutine } = await createRoutine({ name, goal, isPublic })
+    if (createdRoutine.error) throw json(createdRoutine)
+    return json(createdRoutine)
+  }
+
+  if (_action == 'attachActToRoutine') {
+    const { activityId, count, duration, routineId } = data
+    const { attachedAct } = attachActToRoutine({ activityId, count, duration, routineId })
+    if (attachedAct?.error) throw json(attachedAct)
+    console.log(attachedAct)
+    return json(attachedAct)
   }
 
   // fallback throw
@@ -75,42 +85,47 @@ const Routines = () => {
     setFilterBy,
     setFilterValue
   }
-  const activitiesFetcher = useFetcher()
+  const fetcher = useFetcher()
+  const actionData = useActionData()
 
   useEffect(() => {
     if (singleRoutine.id) {
-      activitiesFetcher.load('/activities/allactivities')
+      fetcher.load('/activities/allactivities')
     }
-  }, [filterValue])
+    console.log(actionData?.data)
+    if (actionData?.data.attachedAct) {
+      const newRoutine = {
+        ...singleRoutine,
+        activities: [...singleRoutine.activities, actionData.data.attachedAct]
+      }
+      setSingleRoutine(newRoutine)
+    }
+  }, [filterValue, actionData?.data])
 
-  let allActs = activitiesFetcher.data?.activities ?? []
+  let allActs = fetcher.data?.activities ?? []
 
   const handleIsNav = () => setIsNav(!isNav)
 
   // CBs for activities
   const filteredActivitiesCB = (activity) => {
-    const activities = singleRoutine?.activities
-    const { id } = activity.id
+    const activities = singleRoutine.activities || []
+    const { id } = activity
+    const activityData = activity[filterBy].toLowerCase()
     // check to see if the activity includes our filterValue
-    const isContainsFilterValue = activity[filterBy].includes(filterValue)
+    const isContainsFilterValue = activityData.includes(filterValue)
     // check to see if it's already in the routine
-    const isNotAlreadyAttached = activities?.length ? !activities.some((act) => id == act.id) : true
+    const isNotAlreadyAttached = !activities.some((act) => id == act.id)
     // if it already has it (true) we don't want it (switch to false)
+
     // we want to make sure both conditions are true
     return isNotAlreadyAttached && isContainsFilterValue
   }
 
   // comp for map
-  const SingleSearchedAct = ({ activity }) => (
-    <div key={activity.id}>
-      <p>
-        <strong>{activity.name}</strong>
-      </p>
-      <p>{activity.description}</p>
-    </div>
-  )
 
-  const allActsMapCB = (activity) => <SingleSearchedAct key={activity.id} activity={activity} />
+  const allActsMapCB = (activity) => (
+    <SingleSearchedAct key={activity.id} activity={activity} routineId={singleRoutine.id} />
+  )
 
   // filters and maps for activities
   let filteredAllActs = allActs.filter(filteredActivitiesCB)
@@ -118,12 +133,12 @@ const Routines = () => {
 
   return (
     <article style={{ display: 'flex' }}>
-      <section style={{ width: '66%' }}>
+      <section style={{ width: '66%', marginBottom: '50px' }}>
         <h1>Routines</h1>
         <h2 style={{ marginBottom: '0px' }}>Create a New Routine</h2>
         <NewRoutine />
         <h2>Selected Routine</h2>
-        {singleRoutine.id && <SelectedRoutine activity={singleRoutine} />}
+        {singleRoutine.id && <SelectedRoutine routine={singleRoutine} localState={localState} />}
         <section>
           <h2>List of Routines</h2>
           {!isNav && (

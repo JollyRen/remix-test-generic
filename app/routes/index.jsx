@@ -1,5 +1,4 @@
 import { useOutletContext, Form } from '@remix-run/react'
-import { redirect, json } from '@remix-run/node'
 
 // loader and action
 // export const loader = ({ request }) => {
@@ -18,17 +17,14 @@ export default function Index() {
   } = useOutletContext()
 
   return (
-    <>
-      <h1>Hello</h1>
-      <h2>Hello</h2>
-      <h3>Hello</h3>
-      <p>Hello</p>
-      <span>Hello </span>
-      <em>Hello </em>
-      <strong>Hello </strong>
-      <Form method="post">
-        <button type="submit">test</button>
-      </Form>
-    </>
+    <main>
+      <h1>Welcome to FitnessTrackr!</h1>
+      <p>
+        If you haven't registered, please register to start creating fitness routines and
+        activities, and even adding activities to routines!
+      </p>
+      <p>If you've already registered, please log in.</p>
+      <p>Enjoy using this fun little tool to track and update your fitness schedule!</p>
+    </main>
   )
 }
