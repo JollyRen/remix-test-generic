@@ -53,6 +53,7 @@ export const action = async ({ request }) => {
     if (_action == 'attachActToRoutine') {
       const { routineId, activityId, count, duration } = data
       const { attachedAct } = await attachActToRoutine({ routineId, activityId, count, duration })
+      console.log(attachedAct)
       if (attachedAct.error) throw json(attachedAct)
       return json(attachedAct)
     }

@@ -30,7 +30,7 @@ export function CatchBoundary() {
 
 export const action = async ({ request }) => {
   const formData = await request.formData()
-  console.log(formData)
+  console.log('routines action', formData)
   const { _action, ...data } = Object.fromEntries(formData)
 
   // throw if no actions
@@ -52,7 +52,7 @@ export const action = async ({ request }) => {
     const { activityId, count, duration, routineId } = data
     const { attachedAct } = attachActToRoutine({ activityId, count, duration, routineId })
     if (attachedAct?.error) throw json(attachedAct)
-    console.log(attachedAct)
+    console.log('attachedAct', attachedAct)
     return json(attachedAct)
   }
 
@@ -92,7 +92,7 @@ const Routines = () => {
     if (singleRoutine.id) {
       fetcher.load('/activities/allactivities')
     }
-    console.log(actionData?.data)
+    console.log('actionData, useEffect: ', actionData?.data)
     if (actionData?.data.attachedAct) {
       const newRoutine = {
         ...singleRoutine,
@@ -121,13 +121,11 @@ const Routines = () => {
     return isNotAlreadyAttached && isContainsFilterValue
   }
 
-  // comp for map
-
+  // filters and maps for activities
   const allActsMapCB = (activity) => (
     <SingleSearchedAct key={activity.id} activity={activity} routineId={singleRoutine.id} />
   )
 
-  // filters and maps for activities
   let filteredAllActs = allActs.filter(filteredActivitiesCB)
   let actsMap = filteredAllActs.map(allActsMapCB)
 
